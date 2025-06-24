@@ -24,7 +24,6 @@ function calcularValores() {
   return { renda, fixos, variaveis, meta, despesas, sobra, economia };
 }
 
-// Barra de saúde financeira
 function atualizarSaudeFinanceira(renda, despesas, meta) {
   const percentualGasto = ((despesas + meta) / renda) * 100;
   const barra = document.getElementById("barra-saude");
@@ -51,7 +50,9 @@ function atualizarSaudeFinanceira(renda, despesas, meta) {
 }
 
 function gerarGrafico() {
-  const { fixos, variaveis, meta, sobra, renda, despesas } = calcularValores();
+  document.getElementById("secao-resultados").classList.remove("d-none");
+
+  const { fixos, variaveis, meta, sobra } = calcularValores();
 
   if (chart) chart.destroy();
   const ctx = document.getElementById('grafico').getContext('2d');
@@ -82,7 +83,9 @@ function gerarGrafico() {
 }
 
 async function gerarRelatorioPDF() {
-  const { renda, fixos, variaveis, meta, despesas, sobra, economia } = calcularValores();
+  document.getElementById("secao-resultados").classList.remove("d-none");
+
+  const { renda, fixos, variaveis, meta, despesas, sobra } = calcularValores();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -98,6 +101,8 @@ async function gerarRelatorioPDF() {
 }
 
 async function gerarRelatorioPDFCompleto() {
+  document.getElementById("secao-resultados").classList.remove("d-none");
+
   const { renda, fixos, variaveis, meta, despesas, sobra } = calcularValores();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulador Financeiro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -20,28 +20,28 @@
             Renda Mensal (R$)
             <span title="Valor total que você recebe por mês.">🛈</span>
           </label>
-          <input type="number" id="renda" class="form-control">
+          <input type="number" id="renda" class="form-control" />
         </div>
         <div class="col-md-6">
           <label>
             Gastos Fixos (R$)
             <span title="Despesas que não mudam todo mês, como aluguel, financiamento etc.">🛈</span>
           </label>
-          <input type="number" id="fixos" class="form-control">
+          <input type="number" id="fixos" class="form-control" />
         </div>
         <div class="col-md-6">
           <label>
             Gastos Variáveis (R$)
             <span title="Despesas que variam, como supermercado, lazer, transporte etc.">🛈</span>
           </label>
-          <input type="number" id="variaveis" class="form-control">
+          <input type="number" id="variaveis" class="form-control" />
         </div>
         <div class="col-md-6">
           <label>
             Meta de Economia (R$)
             <span title="Quanto você pretende guardar ou investir por mês.">🛈</span>
           </label>
-          <input type="number" id="meta" class="form-control">
+          <input type="number" id="meta" class="form-control" />
         </div>
         <div class="col-12 text-center">
           <button onclick="gerarGrafico()" class="btn btn-success mt-3 me-2">Gerar Gráfico</button>
@@ -49,44 +49,48 @@
         </div>
       </div>
 
-      <!-- Seção de Saúde Financeira aprimorada -->
-      <div class="saude-financeira mt-4">
-        <h5 class="text-center mb-2">Saúde Financeira</h5>
-        <div class="progress custom-progress mb-2">
-          <div id="barra-saude" class="progress-bar gradient" style="width: 0%">0%</div>
+      <!-- Seção de resultados: inicialmente oculta -->
+      <div id="secao-resultados" class="d-none">
+        <!-- Saúde Financeira -->
+        <div class="saude-financeira mt-4">
+          <h5 class="text-center mb-2">Saúde Financeira</h5>
+          <div class="progress custom-progress mb-2">
+            <div id="barra-saude" class="progress-bar gradient" style="width: 0%">0%</div>
+          </div>
+          <div id="perfil-financeiro" class="text-center fw-bold">Perfil Financeiro: -</div>
         </div>
-        <div id="perfil-financeiro" class="text-center fw-bold">Perfil Financeiro: -</div>
-      </div>
 
-      <!-- Cards de resultado -->
-      <div class="row mt-4 text-center">
-        <div class="col-md-3">
-          <div class="card p-3">
-            <h6>Renda</h6>
-            <span id="card-renda" class="fw-bold">R$ 0,00</span>
+        <!-- Cards -->
+        <div class="row mt-4 text-center">
+          <div class="col-md-3">
+            <div class="card p-3">
+              <h6>Renda</h6>
+              <span id="card-renda" class="fw-bold">R$ 0,00</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3">
+              <h6>Despesas</h6>
+              <span id="card-despesas" class="fw-bold">R$ 0,00</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3">
+              <h6>Economia</h6>
+              <span id="card-economia" class="fw-bold">R$ 0,00</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3">
+              <h6>Sobra</h6>
+              <span id="card-sobra" class="fw-bold">R$ 0,00</span>
+            </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card p-3">
-            <h6>Despesas</h6>
-            <span id="card-despesas" class="fw-bold">R$ 0,00</span>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card p-3">
-            <h6>Economia</h6>
-            <span id="card-economia" class="fw-bold">R$ 0,00</span>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card p-3">
-            <h6>Sobra</h6>
-            <span id="card-sobra" class="fw-bold">R$ 0,00</span>
-          </div>
-        </div>
-      </div>
 
-      <canvas id="grafico" class="mt-4"></canvas>
+        <!-- Gráfico -->
+        <canvas id="grafico" class="mt-4"></canvas>
+      </div>
     </div>
 
     <!-- Simulador de Investimento -->
@@ -98,14 +102,14 @@
             Investimento Inicial (R$)
             <span title="Valor que você já possui ou deseja aplicar logo de início.">🛈</span>
           </label>
-          <input type="number" id="investimento" class="form-control">
+          <input type="number" id="investimento" class="form-control" />
         </div>
         <div class="col-md-6">
           <label>
             Valor Poupado por Mês (R$)
             <span title="Valor que pretende aplicar todos os meses.">🛈</span>
           </label>
-          <input type="number" id="poupancaMes" class="form-control">
+          <input type="number" id="poupancaMes" class="form-control" />
         </div>
         <div class="col-12 text-center">
           <button onclick="simularInvestimento()" class="btn btn-warning mt-3">Simular Rendimentos</button>
