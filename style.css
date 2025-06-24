@@ -1,0 +1,42 @@
+body {
+  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+  color: #fff;
+}
+
+.card {
+  background-color: #ffffffdd;
+  color: #000;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+#grafico {
+  max-width: 300px;
+  max-height: 300px;
+  margin: 0 auto;
+}
+
+.saude-financeira {
+  margin-top: 40px;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.04);
+}
+
+.custom-progress {
+  height: 18px;
+  border-radius: 10px;
+  background-color: #e9ecef;
+  overflow: hidden;
+}
+
+.progress-bar.gradient {
+  background: linear-gradient(to right, #4c8bf5, #6f42c1);
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-align: center;
+}
