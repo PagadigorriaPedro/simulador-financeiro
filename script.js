@@ -82,24 +82,6 @@ function gerarGrafico() {
   });
 }
 
-async function gerarRelatorioPDF() {
-  document.getElementById("secao-resultados").classList.remove("d-none");
-
-  const { renda, fixos, variaveis, meta, despesas, sobra } = calcularValores();
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFontSize(16);
-  doc.text("Relatório Financeiro", 20, 20);
-  doc.setFontSize(12);
-  doc.text(`Renda: ${formatarValor(renda)}`, 20, 40);
-  doc.text(`Gastos Fixos: ${formatarValor(fixos)}`, 20, 50);
-  doc.text(`Gastos Variáveis: ${formatarValor(variaveis)}`, 20, 60);
-  doc.text(`Meta de Economia: ${formatarValor(meta)}`, 20, 70);
-  doc.text(`Sobra: ${formatarValor(sobra)}`, 20, 80);
-  doc.save("relatorio_financeiro.pdf");
-}
-
 async function gerarRelatorioPDFCompleto() {
   document.getElementById("secao-resultados").classList.remove("d-none");
 
@@ -108,42 +90,249 @@ async function gerarRelatorioPDFCompleto() {
   const doc = new jsPDF();
 
   const dataHora = new Date().toLocaleString('pt-BR');
-
-  doc.setFontSize(16);
-  doc.text("Relatório Financeiro Completo", 20, 20);
-  doc.setFontSize(10);
-  doc.text(`Gerado em: ${dataHora}`, 20, 26);
-
-  doc.setFontSize(12);
-  doc.text("Resumo", 20, 36);
-  doc.text(`- Renda Mensal: ${formatarValor(renda)}`, 20, 44);
-  doc.text(`- Gastos Fixos: ${formatarValor(fixos)}`, 20, 50);
-  doc.text(`- Gastos Variáveis: ${formatarValor(variaveis)}`, 20, 56);
-  doc.text(`- Meta de Economia: ${formatarValor(meta)}`, 20, 62);
-
-  doc.text("Totais Calculados", 20, 72);
-  doc.text(`- Despesas Totais: ${formatarValor(despesas)}`, 20, 80);
-  doc.text(`- Economia (meta): ${formatarValor(meta)}`, 20, 86);
-  doc.text(`- Sobra no mês: ${formatarValor(sobra)}`, 20, 92);
-
-  doc.text("Análise e Dicas", 20, 102);
-  if (sobra < 0) {
-    doc.text("Meta de economia inviável com os gastos atuais.", 20, 110);
-    doc.text("Dica: Reveja gastos fixos e variáveis. Priorize reduzir supérfluos.", 20, 116);
-  } else if (sobra < renda * 0.1) {
-    doc.text("Sobra pequena. Há risco de imprevistos afetarem seu orçamento.", 20, 110);
-    doc.text("Dica: Tente cortar despesas variáveis e fazer reserva de emergência.", 20, 116);
+  const percentualGasto = ((despesas + meta) / renda) * 100;
+  let perfilFinanceiro = "";
+  
+  // Determinar perfil financeiro
+  if (percentualGasto <= 50) {
+    perfilFinanceiro = "Econômico - Excelente controle financeiro!";
+  } else if (percentualGasto <= 70) {
+    perfilFinanceiro = "Equilibrado - Boa gestão financeira";
+  } else if (percentualGasto <= 90) {
+    perfilFinanceiro = "Atenção - Precisa de ajustes";
   } else {
-    doc.text("Sua sobra permite alcançar sua meta com segurança.", 20, 110);
-    doc.text("Dica: Invista parte da sobra para crescimento patrimonial.", 20, 116);
+    perfilFinanceiro = "Crítico - Necessita reestruturação urgente";
   }
 
-  doc.text("Observações", 20, 130);
-  doc.setFontSize(10);
-  doc.text("Este relatório é uma simulação com base nas informações fornecidas.", 20, 136);
-  doc.text("Para um planejamento completo, conte com a Clínica Financeira Barracred.", 20, 142);
+  // CABEÇALHO
+  doc.setFillColor(46, 83, 100); // Cor do tema
+  doc.rect(0, 0, 210, 35, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("RELATÓRIO FINANCEIRO COMPLETO", 105, 18, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text("Barracred - Clínica Financeira", 105, 25, { align: 'center' });
+  doc.text(`Gerado em: ${dataHora}`, 105, 31, { align: 'center' });
 
-  doc.save("relatorio_completo.pdf");
+  // Resetar cor do texto
+  doc.setTextColor(0, 0, 0);
+  let yPos = 50;
+
+  // SEÇÃO 1: RESUMO EXECUTIVO
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("RESUMO EXECUTIVO", 20, yPos);
+  yPos += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Perfil Financeiro: ${perfilFinanceiro}`, 20, yPos);
+  yPos += 6;
+  doc.text(`Comprometimento da Renda: ${percentualGasto.toFixed(1)}%`, 20, yPos);
+  yPos += 6;
+  doc.text(`Status da Meta: ${sobra >= 0 ? 'VIÁVEL' : 'INVIÁVEL'}`, 20, yPos);
+  yPos += 15;
+
+  // SEÇÃO 2: DADOS FINANCEIROS
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("DADOS FINANCEIROS", 20, yPos);
+  yPos += 10;
+
+  // Criar tabela de dados
+  const dados = [
+    ['Renda Mensal', formatarValor(renda)],
+    ['Gastos Fixos', formatarValor(fixos)],
+    ['Gastos Variáveis', formatarValor(variaveis)],
+    ['Meta de Economia', formatarValor(meta)],
+    ['Total de Despesas', formatarValor(despesas)],
+    ['Sobra/Déficit', formatarValor(sobra)]
+  ];
+
+  dados.forEach(([item, valor]) => {
+    doc.setFont("helvetica", "normal");
+    doc.text(`• ${item}:`, 25, yPos);
+    doc.setFont("helvetica", "bold");
+    doc.text(valor, 120, yPos);
+    yPos += 7;
+  });
+  yPos += 10;
+
+  // SEÇÃO 3: ANÁLISE DETALHADA
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("ANALISE DETALHADA", 20, yPos);
+  yPos += 10;
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  // Análise de gastos
+  const percentualFixos = (fixos / renda) * 100;
+  const percentualVariaveis = (variaveis / renda) * 100;
+  const percentualEconomia = (meta / renda) * 100;
+
+  doc.text(`Gastos Fixos representam ${percentualFixos.toFixed(1)}% da sua renda`, 25, yPos);
+  yPos += 6;
+  doc.text(`Gastos Variáveis representam ${percentualVariaveis.toFixed(1)}% da sua renda`, 25, yPos);
+  yPos += 6;
+  doc.text(`Meta de Economia representa ${percentualEconomia.toFixed(1)}% da sua renda`, 25, yPos);
+  yPos += 12;
+
+  // SEÇÃO 4: INDICADORES DE SAÚDE FINANCEIRA
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("INDICADORES DE SAUDE FINANCEIRA", 20, yPos);
+  yPos += 10;
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  // Reserva de emergência recomendada
+  const reservaEmergencia = despesas * 6;
+  doc.text(`Reserva de Emergência Recomendada: ${formatarValor(reservaEmergencia)}`, 25, yPos);
+  yPos += 6;
+  doc.text("(Equivalente a 6 meses de despesas)", 25, yPos);
+  yPos += 12;
+
+  // Regra 50-30-20
+  const ideal50 = renda * 0.5;
+  const ideal30 = renda * 0.3;
+  const ideal20 = renda * 0.2;
+
+  doc.text("Comparação com a Regra 50-30-20:", 25, yPos);
+  yPos += 8;
+  doc.text(`• Necessidades (50%): Ideal ${formatarValor(ideal50)} | Atual ${formatarValor(fixos)}`, 30, yPos);
+  yPos += 6;
+  doc.text(`• Desejos (30%): Ideal ${formatarValor(ideal30)} | Atual ${formatarValor(variaveis)}`, 30, yPos);
+  yPos += 6;
+  doc.text(`• Poupança (20%): Ideal ${formatarValor(ideal20)} | Atual ${formatarValor(meta)}`, 30, yPos);
+  yPos += 15;
+
+  // NOVA PÁGINA PARA RECOMENDAÇÕES
+  doc.addPage();
+  yPos = 30;
+
+  // SEÇÃO 5: RECOMENDAÇÕES PERSONALIZADAS
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("RECOMENDACOES PERSONALIZADAS", 20, yPos);
+  yPos += 15;
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  // Recomendações baseadas na situação
+  if (sobra < 0) {
+    doc.text("SITUACAO CRITICA - ACAO IMEDIATA NECESSARIA", 20, yPos);
+    yPos += 10;
+    doc.text("1. Revise URGENTEMENTE todos os gastos variáveis", 25, yPos);
+    yPos += 6;
+    doc.text("2. Considere renda extra ou mudança de emprego", 25, yPos);
+    yPos += 6;
+    doc.text("3. Renegocie dívidas e contratos", 25, yPos);
+    yPos += 6;
+    doc.text("4. Elimine gastos supérfluos temporariamente", 25, yPos);
+    yPos += 6;
+    doc.text(`5. Reduza a meta de economia para ${formatarValor(meta + sobra)}`, 25, yPos);
+  } else if (sobra < renda * 0.1) {
+    doc.text("MARGEM APERTADA - CUIDADO COM IMPREVISTOS", 20, yPos);
+    yPos += 10;
+    doc.text("1. Crie uma reserva de emergência pequena primeiro", 25, yPos);
+    yPos += 6;
+    doc.text("2. Revise gastos variáveis mensalmente", 25, yPos);
+    yPos += 6;
+    doc.text("3. Considere fontes de renda extra", 25, yPos);
+    yPos += 6;
+    doc.text("4. Monitore de perto o orçamento", 25, yPos);
+  } else {
+    doc.text("SITUACAO FAVORAVEL - OPORTUNIDADE DE CRESCIMENTO", 20, yPos);
+    yPos += 10;
+    doc.text("1. Invista a sobra em aplicações rentáveis", 25, yPos);
+    yPos += 6;
+    doc.text("2. Considere aumentar a meta de poupança", 25, yPos);
+    yPos += 6;
+    doc.text("3. Diversifique seus investimentos", 25, yPos);
+    yPos += 6;
+    doc.text("4. Planeje objetivos de longo prazo", 25, yPos);
+  }
+  yPos += 15;
+
+  // SEÇÃO 6: PLANO DE AÇÃO
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("PLANO DE ACAO - PROXIMOS 90 DIAS", 20, yPos);
+  yPos += 15;
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  doc.text("PRIMEIROS 30 DIAS:", 25, yPos);
+  yPos += 8;
+  doc.text("• Anotar todos os gastos diários", 30, yPos);
+  yPos += 6;
+  doc.text("• Identificar 3 gastos desnecessários para cortar", 30, yPos);
+  yPos += 6;
+  doc.text("• Abrir conta poupança ou investimento", 30, yPos);
+  yPos += 10;
+
+  doc.text("30-60 DIAS:", 25, yPos);
+  yPos += 8;
+  doc.text("• Renegociar pelo menos 2 contratos (internet, celular, etc.)", 30, yPos);
+  yPos += 6;
+  doc.text("• Implementar mudanças nos gastos variáveis", 30, yPos);
+  yPos += 6;
+  doc.text("• Começar reserva de emergência", 30, yPos);
+  yPos += 10;
+
+  doc.text("60-90 DIAS:", 25, yPos);
+  yPos += 8;
+  doc.text("• Avaliar progresso e ajustar metas", 30, yPos);
+  yPos += 6;
+  doc.text("• Pesquisar melhores opções de investimento", 30, yPos);
+  yPos += 6;
+  doc.text("• Definir próximos objetivos financeiros", 30, yPos);
+  yPos += 15;
+
+  // SEÇÃO 7: SIMULAÇÃO DE CRESCIMENTO
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(" PROJEÇÃO DE CRESCIMENTO", 20, yPos);
+  yPos += 15;
+
+  if (meta > 0) {
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    
+    const projecoes = [
+      { periodo: "6 meses", valor: meta * 6 },
+      { periodo: "1 ano", valor: meta * 12 },
+      { periodo: "2 anos", valor: meta * 24 },
+      { periodo: "5 anos", valor: meta * 60 }
+    ];
+
+    doc.text("Se mantiver a meta de economia:", 25, yPos);
+    yPos += 10;
+
+    projecoes.forEach(({ periodo, valor }) => {
+      doc.text(`• Em ${periodo}: ${formatarValor(valor)}`, 30, yPos);
+      yPos += 6;
+    });
+  }
+
+  // RODAPÉ
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text("Este relatório foi gerado automaticamente com base nas informações fornecidas.", 20, 280);
+  doc.text("Para um acompanhamento personalizado, procure a Clínica Financeira Barracred.", 20, 285);
+  doc.text("Relatório confidencial - Uso restrito do titular", 20, 290);
+
+  // Salvar o PDF
+  doc.save(`relatorio_financeiro_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
 function simularInvestimento() {
